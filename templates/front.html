@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurants</title>
+</head>
+<body>
+    <h1>Restaurants</h1>
+    <a href = '/restaurants/new' > Make a New Restaurant Here </a>
+    {% for restaurant in restaurants %}
+        <h3>{{ restaurant.name }}</h3>
+        <a href="/restaurants/{{ restaurant.id }}/edit">edit</a>
+        <a href="/restaurants/{{ restaurant.id }}/delete">delete</a>
+    {% endfor %}
+</body>
+</html>

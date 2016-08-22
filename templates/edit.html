@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit a Restaurant</title>
+</head>
+<body>
+    <h1>{{ restaurant.name }}</h1>
+    <form method="post" action="" enctype='multipart/form-data'>
+        <input type="text" name="new_restaurant" value="">
+        <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+        <input type='submit' value='Rename'>
+    </form>
+</body>
+</html>
