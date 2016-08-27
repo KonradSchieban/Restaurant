@@ -4,8 +4,12 @@ import jinja2
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 
 from database_setup import Restaurant, Base, MenuItem
+
+# Initilize Flask
+app = Flask(__name__)
 
 # Initialize Jinja2
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -145,15 +149,84 @@ class webServerHandler(BaseHTTPRequestHandler):
             pass
 
 
-def main():
-    try:
-        port = 8080
-        server = HTTPServer(('', port), webServerHandler)
-        print "Web Server running on port %s" % port
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print " ^C entered, stopping web server...."
-        server.socket.close()
+@app.route('/')
+@app.route('/hello')
+def HelloWorld():
+    return "Hello World"
+
+@app.route('/restaurants/<int:restaurant_id>/')
+def restaurant_menu(restaurant_id):
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    menu_items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
+
+    return render_template('restaurant.html', menu_items=menu_items, restaurant_id=restaurant_id)
+
+
+@app.route('/restaurants/<int:restaurant_id>/new', methods=['GET', 'POST'])
+def new_menu_item(restaurant_id):
+
+    if request.method == 'POST':
+        name = request.form['menu_name']
+        price = request.form['menu_price']
+        description = request.form['menu_description']
+        course = request.form['menu_course']
+
+        new_item = MenuItem(name=name, price=price, description=description, course=course, restaurant_id=restaurant_id)
+        session.add(new_item)
+        session.commit()
+
+        flash("new menu item created!")
+
+        return redirect(url_for('restaurant_menu', restaurant_id=restaurant_id))
+
+    else:  # GET
+        return render_template('new_menu_item.html', restaurant_id=restaurant_id)
+
+
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit')
+def edit_menu_item(restaurant_id, menu_id):
+    menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
+
+    return render_template('edit_menu_item.html',
+                           restaurant_id=restaurant_id,
+                           menu_item=menu_item,
+                           menu_item_id=menu_id)
+
+
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete', methods=['GET', 'POST'])
+def delete_menu_item(restaurant_id, menu_id):
+
+    menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
+
+    if request.method == 'POST':
+
+        session.delete(menu_item)
+        session.commit()
+
+        return redirect(url_for('restaurant_menu', restaurant_id=restaurant_id))
+
+    else:  # GET
+        return render_template('delete_menu_item.html',
+                               restaurant_id=restaurant_id,
+                               menu_item=menu_item,
+                               menu_item_id=menu_id)
+
+
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
+def restaurantMenuJSON(restaurant_id):
+
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
+    return jsonify(MenuItems=[i.serialize for i in items])
+
+
+# ADD JSON ENDPOINT HERE
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+def menuItemJSON(restaurant_id, menu_id):
+    menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
+    return jsonify(MenuItem=menu_item.serialize)
+
 
 if __name__ == '__main__':
-    main()
+    app.secret_key = "password1234."
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)

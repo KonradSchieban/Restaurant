@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Menu Item</title>
+</head>
+<body>
+    <h1>Edit menu item</h1>
+    <form method="post" action="" enctype='multipart/form-data'>
+        <table style="width:50%">
+            <tr>
+                <td>Name: </td>
+                <td><input type="text" name="menu_name" value="{{ menu_item.name }}"></td>
+            </tr>
+            <tr>
+                <td>Description: </td>
+                <td><input type="text" name="menu_description" value="{{ menu_item.description }}"></td>
+            </tr>
+            <tr>
+                <td>Price: </td>
+                <td><input type="text" name="menu_price" value="{{ menu_item.price }}"></td>
+            </tr>
+            <tr>
+                <td>Course: </td>
+                <td><input type="text" name="menu_course" value="{{ menu_item.course }}"></td>
+            </tr>
+        </table>
+        <input type="hidden" name="restaurant_id" value="{{ restaurant_id }}">
+        <input type="hidden" name="menu_item_id" value="{{ menu_item_id }}">
+        <input type='submit' value='Edit'>
+    </form>
+</body>
+</html>

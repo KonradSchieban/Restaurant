@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Menu Item</title>
+</head>
+<body>
+    <h1>Delete menu item</h1>
+    <h3>Do you really want to delete menu item {{ menu_item.name }}</h3>
+
+    <form method="post" action="" enctype='multipart/form-data'>
+        <input type="hidden" name="restaurant_id" value="{{ restaurant_id }}">
+        <input type="hidden" name="menu_item_id" value="{{ menu_item_id }}">
+        <input type='submit' value='Confirm'>
+    </form>
+</body>
+</html>
